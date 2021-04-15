@@ -5,8 +5,8 @@ from . import rjctRandField
 
 
 def loop(
-    clust_xy, clust_data, N_membs, clust_method, clRjctMethod,
-    KDE_vals, Kest, C_thresh, cl_method_pars, prfl, N_cl_max=10000,
+    clust_xy, clust_data, N_membs, N_cl_max, clust_method, clRjctMethod,
+    KDE_vals, Kest, C_thresh, cl_method_pars, prfl,
         N_st_max=20000, minStars=3):
     """
     Perform the inner loop: cluster --> reject
@@ -15,8 +15,6 @@ def loop(
     those masks that point to clusters that survived the test with uniform
     random 2D fields in (x, y).
 
-    N_cl_max : int
-      maximum number of clusters allowed
     N_st_max : int
       maximum numbers of stars for the Voronoi and kNNdens algorithms.
       Above this threshold, the 'cdist' function is avoided.

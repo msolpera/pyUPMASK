@@ -10,8 +10,9 @@ from . import KDEAnalysis
 
 def loop(
     ID, xy, data, data_err, resampleFlag, PCAflag, PCAdims, GUMM_flag,
-    GUMM_perc, KDEP_flag, N_membs, clust_method, clRjctMethod, Kest, C_thresh,
-        cl_method_pars, prfl, KDE_vals, standard_scale=True, maxIL=25):
+    GUMM_perc, KDEP_flag, IL_runs, N_membs, N_cl_max, clust_method,
+    clRjctMethod, Kest, C_thresh, cl_method_pars, prfl, KDE_vals,
+        standard_scale=True):
     """
     Perform the outer loop: inner loop until all "fake" clusters are rejected
     """
@@ -27,13 +28,13 @@ def loop(
     clust_data = dimReduc(clust_data, PCAflag, PCAdims, prfl)
 
     # Call the inner loop until all the "fake clusters" are rejected
-    for _iter in range(maxIL):
+    for _iter in range(IL_runs):
         print("\n IL iteration {}".format(_iter + 1), file=prfl)
 
         # Call the Inner Loop (IL)
         N_clusts, msk_all, N_survived, KDE_vals = inner.loop(
-            clust_xy, clust_data, N_membs, clust_method, clRjctMethod,
-            KDE_vals, Kest, C_thresh, cl_method_pars, prfl)
+            clust_xy, clust_data, N_membs, N_cl_max, clust_method,
+            clRjctMethod, KDE_vals, Kest, C_thresh, cl_method_pars, prfl)
 
         # No clusters were rejected in this iteration of the IL. This means
         # that the method converged. Break
@@ -73,7 +74,7 @@ def loop(
                 print(" Rejected {} stars as non-members".format(
                     len(probs_cl) - msk.sum()), file=prfl)
 
-    if _iter + 1 == maxIL:
+    if _iter + 1 == IL_runs:
         print("Maximum number of IL runs reached. Breaking", file=prfl)
 
     # Mark all the stars that survived in 'clust_ID' as members assigning

@@ -12,8 +12,9 @@ import multiprocessing as mp
 def main(
     ID_c, x_c, y_c, data_cols, data_errs, oultr_method, stdRegion_nstd,
     rnd_seed, verbose, OL_runs, parallel_flag, parallel_procs,
-    resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag, N_membs,
-        clust_method, clRjctMethod, C_thresh, cl_method_pars):
+    resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag, IL_runs,
+    N_membs, N_cl_max, clust_method, clRjctMethod, C_thresh,
+        cl_method_pars):
     """
     """
     out_folder = "output"
@@ -24,7 +25,7 @@ def main(
     inputfiles = readFiles()
     for file_path in inputfiles:
 
-        print("\n\n")
+        print("\n")
         print("===========================================================")
         print("Processing         : {}".format(file_path.name))
 
@@ -42,8 +43,8 @@ def main(
         probs_all = dataProcess(
             ID, xy01, data, data_err, rnd_seed, verbose, OL_runs,
             parallel_flag, parallel_procs, resampleFlag, PCAflag, PCAdims,
-            GUMM_flag, GUMM_perc, KDEP_flag, N_membs, clust_method,
-            clRjctMethod, C_thresh, cl_method_pars)
+            GUMM_flag, GUMM_perc, KDEP_flag, IL_runs, N_membs, N_cl_max,
+            clust_method, clRjctMethod, C_thresh, cl_method_pars)
 
         if OL_runs > 1:
             # Obtain the mean of all runs. This are the final probabilities
@@ -63,8 +64,8 @@ def main(
 def dataProcess(
     ID, xy, data, data_err, rnd_seed, verbose, OL_runs, parallel_flag,
     parallel_procs, resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc,
-    KDEP_flag, N_membs, clust_method, clRjctMethod, C_thresh,
-        cl_method_pars):
+    KDEP_flag, IL_runs, N_membs, N_cl_max, clust_method, clRjctMethod,
+        C_thresh, cl_method_pars):
     """
     """
     start_t = t.time()
@@ -126,8 +127,8 @@ def dataProcess(
     # Arguments for the Outer Loop
     OLargs = (
         ID, xy, data, data_err, resampleFlag, PCAflag, PCAdims, GUMM_flag,
-        GUMM_perc, KDEP_flag, N_membs, clust_method, clRjctMethod, Kest,
-        C_thresh, cl_method_pars, prfl)
+        GUMM_perc, KDEP_flag, IL_runs, N_membs, N_cl_max, clust_method,
+        clRjctMethod, Kest, C_thresh, cl_method_pars, prfl)
 
     # TODO: Breaks if verbose=0
     if parallel_flag is True:
@@ -192,15 +193,5 @@ def readFiles():
 if __name__ == '__main__':
 
     # Read input parameters.
-    ID_c, x_c, y_c, data_cols, data_errs, oultr_method, stdRegion_nstd,\
-        rnd_seed, verbose, OL_runs, parallel_flag, parallel_procs,\
-        resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag,\
-        N_membs, clust_method, clRjctMethod, C_thresh, cl_method_pars =\
-        readINI()
-
-    main(
-        ID_c, x_c, y_c, data_cols, data_errs, oultr_method,
-        stdRegion_nstd, rnd_seed, verbose, OL_runs, parallel_flag,
-        parallel_procs, resampleFlag, PCAflag, PCAdims, GUMM_flag,
-        GUMM_perc, KDEP_flag, N_membs, clust_method, clRjctMethod,
-        C_thresh, cl_method_pars)
+    params = readINI()
+    main(*params)

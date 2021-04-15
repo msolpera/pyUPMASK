@@ -5,6 +5,7 @@ from astropy.io import ascii
 from astropy.table import Column
 from astropy.table import Table
 import configparser
+import warnings
 from distutils.util import strtobool
 from sklearn.preprocessing import MinMaxScaler
 from .outlierRjct import stdRegion, sklearnMethod
@@ -57,8 +58,24 @@ def readINI():
 
     # Arguments for the Inner Loop
     inner_loop = in_params['Inner loop']
-    N_membs, clust_method = inner_loop.getint('N_membs'),\
+    IL_runs, N_membs, N_cl_max, clust_method = inner_loop.getint('IL_runs'),\
+        inner_loop.getint('N_membs'), inner_loop.getint('N_cl_max'),\
         inner_loop.get('clust_method')
+
+    allowed_clust_methods = (
+        'KMeans', 'MiniBatchKMeans', 'AffinityPropagation', 'MeanShift',
+        'SpectralClustering', 'AgglomerativeClustering', 'DBSCAN', 'OPTICS',
+        'Birch', 'GaussianMixture', 'BayesianGaussianMixture', 'Voronoi',
+        'rkmeans', 'kNNdens')
+    if clust_method not in allowed_clust_methods:
+        raise ValueError("Unrecognized clustering method '{}'".format(
+            clust_method))
+
+    single_run_methods = ('Voronoi', 'rkmeans', 'kNNdens')
+    if clust_method in single_run_methods and OL_runs > 1:
+        warnings.warn(
+            "Single run method selected, only one OL run will be processed")
+        OL_runs = 1
 
     # Only allow the 'rkfunc' method
     # inner_loop.get('clRjctMethod'), inner_loop.getfloat('C_thresh')
@@ -74,7 +91,8 @@ def readINI():
     return ID_c, x_c, y_c, data_cols, data_errs, oultr_method, stdRegion_nstd,\
         rnd_seed, verbose, OL_runs, parallel_flag, parallel_procs,\
         resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag,\
-        N_membs, clust_method, clRjctMethod, C_thresh, cl_method_pars
+        IL_runs, N_membs, N_cl_max, clust_method, clRjctMethod, C_thresh,\
+        cl_method_pars
 
 
 def dread(file_path, ID_c, x_c, y_c, data_cols, data_errs):
