@@ -11,7 +11,7 @@ def GUMMProbs(clust_xy, n_epochs=1000, stable_per=.1):
     Based on the GMM model implementation shown in:
     https://towardsdatascience.com/gaussian-mixture-models-explained-6986aaf5a95
     """
-    cluster = initialize_cluster(clust_xy)
+    cluster = initialize_cluster()
 
     lkl_old, nstable = -np.inf, 0
     for i in range(n_epochs):
@@ -38,7 +38,7 @@ def GUMMProbs(clust_xy, n_epochs=1000, stable_per=.1):
     return gumm_p
 
 
-def initialize_cluster(data):
+def initialize_cluster():
     """
     Initialize the 2D Gaussian parameters, and the weights for both
     distributions.
