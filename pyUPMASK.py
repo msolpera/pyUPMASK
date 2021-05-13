@@ -10,8 +10,8 @@ import multiprocessing as mp
 
 
 def main(
-    ID_c, x_c, y_c, data_cols, data_errs, oultr_method, stdRegion_nstd,
-    rnd_seed, verbose, OL_runs, parallel_flag, parallel_procs,
+    parallel_flag, parallel_procs, ID_c, x_c, y_c, data_cols, data_errs,
+    oultr_method, stdRegion_nstd, rnd_seed, verbose, OL_runs,
     resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag, IL_runs,
     N_membs, N_cl_max, clust_method, clRjctMethod, C_thresh,
         cl_method_pars):
@@ -82,9 +82,6 @@ def dataProcess(
         print("Apply PCA          : {}".format(PCAflag))
         print(" PCA N_dims        : {}".format(PCAdims))
     print("Outer loop runs    : {}".format(OL_runs))
-    print(" Parallel runs     : {}".format(parallel_flag))
-    if parallel_flag:
-        print(" Processes         : {}".format(parallel_procs))
     print("Stars per cluster  : {}".format(N_membs))
     print("Clustering method  : {}".format(clust_method))
     if cl_method_pars:
@@ -133,7 +130,8 @@ def dataProcess(
     # TODO: Breaks if verbose=0
     if parallel_flag is True:
         if parallel_procs == 'None':
-            N_cpu = mp.cpu_count()
+            # Use *almost* all the cores
+            N_cpu = mp.cpu_count() - 1
         else:
             N_cpu = int(parallel_procs)
         with mp.Pool(processes=N_cpu) as p:
@@ -194,4 +192,29 @@ if __name__ == '__main__':
 
     # Read input parameters.
     params = readINI()
+
+    # Set number of cores to use
+    # Source: https://stackoverflow.com/a/58195413/1391441
+    parallel_flag, parallel_procs = params[:2]
+    if parallel_flag:
+        if parallel_procs == 'None':
+            # Use *almost* all the cores
+            parallel_procs = mp.cpu_count() - 1
+
+        # Never use more than these cores
+        parallel_procs = min(parallel_procs, mp.cpu_count() - 1)
+    else:
+        parallel_procs = 1
+
+    parallel_procs = str(parallel_procs)
+    os.environ["OMP_NUM_THREADS"] = parallel_procs
+    os.environ["MKL_NUM_THREADS"] = parallel_procs
+    os.environ["OPENBLAS_NUM_THREADS"] = parallel_procs
+    os.environ["VECLIB_MAXIMUM_THREADS"] = parallel_procs
+    os.environ["NUMEXPR_NUM_THREADS"] = parallel_procs
+
+    print("***********************************************************")
+    print("Parallel runs      : {}".format(parallel_flag))
+    print("Processes          : {}".format(parallel_procs))
+
     main(*params)

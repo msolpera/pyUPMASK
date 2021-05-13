@@ -88,8 +88,8 @@ def readINI():
     for key, val in in_params['Clustering parameters'].items():
         cl_method_pars[key] = vtype(val)
 
-    return ID_c, x_c, y_c, data_cols, data_errs, oultr_method, stdRegion_nstd,\
-        rnd_seed, verbose, OL_runs, parallel_flag, parallel_procs,\
+    return parallel_flag, parallel_procs, ID_c, x_c, y_c, data_cols,\
+        data_errs, oultr_method, stdRegion_nstd, rnd_seed, verbose, OL_runs,\
         resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag,\
         IL_runs, N_membs, N_cl_max, clust_method, clRjctMethod, C_thresh,\
         cl_method_pars
