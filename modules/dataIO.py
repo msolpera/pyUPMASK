@@ -182,7 +182,7 @@ def dwrite(out_folder, file_path, full_data, msk_data, probs_all, probs_mean):
 
         pf = np.zeros(len(full_data)) - 1.
         pf[msk_data] = probs_mean
-        full_data.add_column(Column(np.round(pf, 2), name='probs_final'))
+        full_data.add_column(Column(np.round(pf, 4), name='probs_final'))
     else:
         ext = file_path.suffix
         file_path = Path(str(file_path).replace(ext, '_rjct' + ext))
