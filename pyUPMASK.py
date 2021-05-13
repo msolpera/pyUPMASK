@@ -200,9 +200,9 @@ if __name__ == '__main__':
         if parallel_procs == 'None':
             # Use *almost* all the cores
             parallel_procs = mp.cpu_count() - 1
-
-        # Never use more than these cores
-        parallel_procs = min(parallel_procs, mp.cpu_count() - 1)
+        else:
+            # Never use more than these cores
+            parallel_procs = min(int(parallel_procs), mp.cpu_count() - 1)
     else:
         parallel_procs = 1
 
