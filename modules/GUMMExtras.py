@@ -8,7 +8,7 @@ def GUMMProbCut(GUMM_perc, gumm_p):
     """
     # Select the probability cut.
     if GUMM_perc == 'auto':
-        # Create the percentiles (/100.) vs provabilities array.
+        # Create the percentiles (/100.) vs probabilities array.
         percentiles = np.arange(.01, .99, .01)
         perc_probs = np.array([
             percentiles, np.percentile(gumm_p, percentiles * 100.)]).T
