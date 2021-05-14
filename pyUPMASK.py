@@ -10,11 +10,10 @@ import multiprocessing as mp
 
 
 def main(
-    parallel_flag, parallel_procs, ID_c, x_c, y_c, data_cols, data_errs,
-    oultr_method, stdRegion_nstd, rnd_seed, verbose, OL_runs,
-    resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag, IL_runs,
-    N_membs, N_cl_max, clust_method, clRjctMethod, C_thresh,
-        cl_method_pars):
+    parallel_flag, parallel_procs, rnd_seed, verbose, ID_c, x_c, y_c,
+    data_cols, data_errs, oultr_method, stdRegion_nstd, OL_runs, resampleFlag,
+    PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag, IL_runs, N_membs,
+        N_cl_max, clust_method, clRjctMethod, C_thresh, cl_method_pars):
     """
     """
     out_folder = "output"
@@ -28,6 +27,13 @@ def main(
         print("\n")
         print("===========================================================")
         print("Processing         : {}".format(file_path.name))
+        # Set a random seed for reproducibility
+        if rnd_seed == 'None':
+            seed = np.random.randint(100000)
+        else:
+            seed = int(rnd_seed)
+        print("Random seed        : {}".format(seed))
+        np.random.seed(seed)
 
         # Original data
         full_data, cl_ID, cl_xy, cl_data, cl_errs, data_rjct = dread(
@@ -41,7 +47,7 @@ def main(
         xy01 = dxynorm(xy)
 
         probs_all = dataProcess(
-            ID, xy01, data, data_err, rnd_seed, verbose, OL_runs,
+            ID, xy01, data, data_err, verbose, OL_runs,
             parallel_flag, parallel_procs, resampleFlag, PCAflag, PCAdims,
             GUMM_flag, GUMM_perc, KDEP_flag, IL_runs, N_membs, N_cl_max,
             clust_method, clRjctMethod, C_thresh, cl_method_pars)
@@ -62,7 +68,7 @@ def main(
 
 
 def dataProcess(
-    ID, xy, data, data_err, rnd_seed, verbose, OL_runs, parallel_flag,
+    ID, xy, data, data_err, verbose, OL_runs, parallel_flag,
     parallel_procs, resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc,
     KDEP_flag, IL_runs, N_membs, N_cl_max, clust_method, clRjctMethod,
         C_thresh, cl_method_pars):
@@ -78,48 +84,47 @@ def dataProcess(
         prfl = None
 
     # Print input parameters to screen
+    if parallel_flag:
+        print("Parallel runs      : {}".format(parallel_flag))
+        print("Processes          : {}".format(parallel_procs))
+    print("Outer loop runs    : {}".format(OL_runs))
     if PCAflag:
         print("Apply PCA          : {}".format(PCAflag))
         print(" PCA N_dims        : {}".format(PCAdims))
-    print("Outer loop runs    : {}".format(OL_runs))
-    print("Stars per cluster  : {}".format(N_membs))
-    print("Clustering method  : {}".format(clust_method))
-    if cl_method_pars:
-        for key, val in cl_method_pars.items():
-            print(" {:<17} : {}".format(key, val))
-    print("Rejection method   : {}".format(clRjctMethod))
-    if clRjctMethod != 'rkfunc':
-        print("Threshold          : {:.2f}".format(C_thresh))
     if GUMM_flag:
         print("Apply GUMM         : {}".format(GUMM_flag))
         print(" GUMM percentile   : {}".format(GUMM_perc))
     if KDEP_flag:
         print("Obtain KDE probs   : {}".format(KDEP_flag))
-    # Set a random seed for reproducibility
-    if rnd_seed == 'None':
-        seed = np.random.randint(100000)
-    else:
-        seed = int(rnd_seed)
-    print("Random seed        : {}".format(seed))
-    np.random.seed(seed)
 
-    Kest = None
+    print("Inner loop runs    : {}".format(IL_runs))
+    print("Stars per cluster  : {}".format(N_membs))
+    print("Maximum clusters   : {}".format(N_cl_max))
+    print("Clustering method  : {}".format(clust_method))
+    if cl_method_pars:
+        for key, val in cl_method_pars.items():
+            print(" {:<17} : {}".format(key, val))
+    print("")
+    # print("Rejection method   : {}".format(clRjctMethod))
+    # if clRjctMethod != 'rkfunc':
+    #     print("Threshold          : {:.2f}".format(C_thresh))
+
     # Define RK test with an area of 1.
-    if clRjctMethod == 'rkfunc':
-        Kest = RipleysKEstimator(area=1, x_max=1, y_max=1, x_min=0, y_min=0)
-
-    if clRjctMethod == 'kdetest' or clust_method == 'rkmeans':
-        from rpy2.robjects import r
-        from rpy2.robjects import numpy2ri
-        from rpy2.robjects.packages import importr
-        # cat(paste("R version: ",R.version.string,"\n"))
-        importr('MASS')
-        r("""
-        set.seed(12345)
-        """)
-        numpy2ri.activate()
-        r.assign('nruns', 2000)
-        r.assign('nKde', 50)
+    # Kest = None
+    # if clRjctMethod == 'rkfunc':
+    Kest = RipleysKEstimator(area=1, x_max=1, y_max=1, x_min=0, y_min=0)
+    # if clRjctMethod == 'kdetest' or clust_method == 'rkmeans':
+    #     from rpy2.robjects import r
+    #     from rpy2.robjects import numpy2ri
+    #     from rpy2.robjects.packages import importr
+    #     # cat(paste("R version: ",R.version.string,"\n"))
+    #     importr('MASS')
+    #     r("""
+    #     set.seed(12345)
+    #     """)
+    #     numpy2ri.activate()
+    #     r.assign('nruns', 2000)
+    #     r.assign('nKde', 50)
 
     # Arguments for the Outer Loop
     OLargs = (
@@ -190,31 +195,34 @@ def readFiles():
 
 if __name__ == '__main__':
 
+    # # Limit numpy's cores used to 1
+    # # Source: https://stackoverflow.com/a/58195413/1391441, also
+    # # https://stackoverflow.com/q/17053671/1391441
+
+    # parallel_flag, parallel_procs = params[:2]
+    # if parallel_flag:
+    #     if parallel_procs == 'None':
+    #         # Use *almost* all the cores
+    #         parallel_procs = mp.cpu_count() - 1
+    #     else:
+    #         # Never use more than these cores
+    #         parallel_procs = min(int(parallel_procs), mp.cpu_count() - 1)
+    # else:
+    #     parallel_procs = 1
+
     # Read input parameters.
     params = readINI()
 
-    # Set number of cores to use
-    # Source: https://stackoverflow.com/a/58195413/1391441
-    parallel_flag, parallel_procs = params[:2]
-    if parallel_flag:
-        if parallel_procs == 'None':
-            # Use *almost* all the cores
-            parallel_procs = mp.cpu_count() - 1
-        else:
-            # Never use more than these cores
-            parallel_procs = min(int(parallel_procs), mp.cpu_count() - 1)
+    if params[0] is False:
+        # Disable numpy's multithreading
+        parallel_procs = str(1)
+        os.environ["OMP_NUM_THREADS"] = parallel_procs
+        os.environ["MKL_NUM_THREADS"] = parallel_procs
+        os.environ["OPENBLAS_NUM_THREADS"] = parallel_procs
+        os.environ["VECLIB_MAXIMUM_THREADS"] = parallel_procs
+        os.environ["NUMEXPR_NUM_THREADS"] = parallel_procs
     else:
-        parallel_procs = 1
+        # If numpy is allowed to multithread, disable the parallel run
+        params[1] = False
 
-    parallel_procs = str(parallel_procs)
-    os.environ["OMP_NUM_THREADS"] = parallel_procs
-    os.environ["MKL_NUM_THREADS"] = parallel_procs
-    os.environ["OPENBLAS_NUM_THREADS"] = parallel_procs
-    os.environ["VECLIB_MAXIMUM_THREADS"] = parallel_procs
-    os.environ["NUMEXPR_NUM_THREADS"] = parallel_procs
-
-    print("***********************************************************")
-    print("Parallel runs      : {}".format(parallel_flag))
-    print("Processes          : {}".format(parallel_procs))
-
-    main(*params)
+    main(*params[1:])

@@ -31,7 +31,18 @@ def readINI():
     in_params.read('params.ini')
 
     # Data columns
-    data_columns = in_params['Data columns']
+    gen_pars = in_params["General parameters"]
+    rnd_seed, verbose, parallel_flag, parallel_procs, np_mthread =\
+        gen_pars.get('rnd_seed'), gen_pars.getint('verbose'),\
+        gen_pars.getboolean('parallel'), gen_pars.get('processes'),\
+        gen_pars.getboolean('numpy_multi')
+    if parallel_procs not in ('None', 'none', 'NONE'):
+        parallel_procs = int(parallel_procs)
+        if parallel_procs <= 0:
+            raise ValueError("The 'processes' parameter must be >0")
+
+    # Data columns
+    data_columns = in_params["Input file's data columns"]
     ID_c = data_columns['ID']
     x_c, y_c = data_columns['xy_coords'].split()
     data_cols = data_columns['data'].split()
@@ -40,11 +51,9 @@ def readINI():
 
     # Arguments for the Outer Loop
     outer_loop = in_params['Outer loop']
-    rnd_seed, verbose, OL_runs, parallel_flag, parallel_procs, resampleFlag,\
+    OL_runs, resampleFlag,\
         PCAflag, PCAdims, GUMM_flag, KDEP_flag =\
-        outer_loop.get('rnd_seed'), outer_loop.getint('verbose'),\
-        outer_loop.getint('OL_runs'), outer_loop.getboolean('parallel'),\
-        outer_loop.get('processes'), outer_loop.getboolean('resampleFlag'),\
+        outer_loop.getint('OL_runs'), outer_loop.getboolean('resampleFlag'),\
         outer_loop.getboolean('PCAflag'), outer_loop.getint('PCAdims'),\
         outer_loop.getboolean('GUMM_flag'), outer_loop.getboolean('KDEP_flag')
     GUMM_perc = outer_loop.get('GUMM_perc')
@@ -88,11 +97,12 @@ def readINI():
     for key, val in in_params['Clustering parameters'].items():
         cl_method_pars[key] = vtype(val)
 
-    return parallel_flag, parallel_procs, ID_c, x_c, y_c, data_cols,\
-        data_errs, oultr_method, stdRegion_nstd, rnd_seed, verbose, OL_runs,\
-        resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc, KDEP_flag,\
-        IL_runs, N_membs, N_cl_max, clust_method, clRjctMethod, C_thresh,\
-        cl_method_pars
+    return [
+        np_mthread, parallel_flag, parallel_procs, rnd_seed, verbose,
+        ID_c, x_c, y_c, data_cols, data_errs, oultr_method, stdRegion_nstd,
+        OL_runs, resampleFlag, PCAflag, PCAdims, GUMM_flag, GUMM_perc,
+        KDEP_flag, IL_runs, N_membs, N_cl_max, clust_method, clRjctMethod,
+        C_thresh, cl_method_pars]
 
 
 def dread(file_path, ID_c, x_c, y_c, data_cols, data_errs):
