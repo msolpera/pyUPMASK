@@ -157,8 +157,8 @@ def dataProcess(
 
             p_dist = [
                 (np.mean(probs_all, 0) > _).sum() for _ in
-                (.1, .3, .5, .7, .9)]
-            print("\nP>(.1, .3, .5, .7, .9): {}, {}, {}, {}, {}".format(
+                (.5, .75, .9, .95, .99)]
+            print("\nP>(.5, .75, .9, .95, .99): {}, {}, {}, {}, {}".format(
                 *p_dist), file=prfl)
 
     elapsed = t.time() - start_t
