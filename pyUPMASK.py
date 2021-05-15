@@ -73,7 +73,7 @@ def dataProcess(
     """
     start_t = t.time()
 
-    # TODO this should be handled by the loggi5ng() module
+    # TODO this should be handled by the logging() module
     # Set print() according to the 'verbose' parameter
     if verbose == 0:
         prfl = open(os.devnull, 'w')
