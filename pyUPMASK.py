@@ -61,10 +61,7 @@ def main(
 
         # Write final data to file
         dwrite(
-            out_folder, file_path, full_data, msk_data, probs_all, probs_mean)
-        # Write rejected data (if any)
-        if len(data_rjct) > 0:
-            dwrite(out_folder, file_path, data_rjct, None, [], [])
+            out_folder, file_path, full_data, msk_data, data_rjct, probs_mean)
 
 
 def dataProcess(
@@ -76,7 +73,7 @@ def dataProcess(
     """
     start_t = t.time()
 
-    # TODO this should be handled by the logging() module
+    # TODO this should be handled by the loggi5ng() module
     # Set print() according to the 'verbose' parameter
     if verbose == 0:
         prfl = open(os.devnull, 'w')

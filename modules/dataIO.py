@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 from astropy.io import ascii
 from astropy.table import Column
-from astropy.table import Table
+from astropy.table import Table, vstack
 import configparser
 import warnings
 from distutils.util import strtobool
@@ -178,28 +178,22 @@ def dxynorm(xy_data):
     return xy
 
 
-def dwrite(out_folder, file_path, full_data, msk_data, probs_all, probs_mean):
+def dwrite(out_folder, file_path, full_data, msk_data, data_rjct, probs_mean):
     """
     """
-    if msk_data is not None:
-        out_path = Path(out_folder, *file_path.parts[1:])
+    out_path = Path(out_folder, *file_path.parts[1:])
 
-        for i, p in enumerate(probs_all):
-            # Fill masked data with '-1'
-            p0 = np.zeros(len(full_data)) - 1.
-            p0[msk_data] = p
-            full_data.add_column(Column(np.round(p0, 2), name='prob' + str(i)))
+    # Assign probabilities of '-1' to outliers
+    pf = np.zeros(len(full_data)) - 1.
+    pf[msk_data] = probs_mean
+    full_data.add_column(Column(np.round(pf, 4), name='probs_final'))
 
-        pf = np.zeros(len(full_data)) - 1.
-        pf[msk_data] = probs_mean
-        full_data.add_column(Column(np.round(pf, 4), name='probs_final'))
-    else:
-        ext = file_path.suffix
-        file_path = Path(str(file_path).replace(ext, '_rjct' + ext))
-        out_path = Path(out_folder, *file_path.parts[1:])
+    # Assign probabilities of '-1' to rejected stars (if any)
+    if len(data_rjct) > 0:
+        pf = np.zeros(len(data_rjct)) - 1.
+        data_rjct.add_column(Column(pf), name='probs_final')
+        full_data = vstack([full_data, data_rjct])
 
-    # Create sub-folder if it does not exist
-    out_path.parent.mkdir(parents=True, exist_ok=True)
     ascii.write(full_data, out_path, overwrite=True)
 
 
