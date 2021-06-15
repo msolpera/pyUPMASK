@@ -81,7 +81,8 @@ def readINI():
             clust_method))
 
     single_run_methods = ('Voronoi', 'rkmeans', 'kNNdens')
-    if clust_method in single_run_methods and OL_runs > 1:
+    if clust_method in single_run_methods and OL_runs > 1\
+            and resampleFlag is False:
         warnings.warn(
             "Single run method selected, only one OL run will be processed")
         OL_runs = 1
