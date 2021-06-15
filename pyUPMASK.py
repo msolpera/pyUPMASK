@@ -5,7 +5,7 @@ import numpy as np
 from astropy.stats import RipleysKEstimator
 import time as t
 from modules import outer
-from modules.dataIO import readINI, dread, dmask, dxynorm, dwrite
+from modules.dataIO import readFiles, readINI, dread, dmask, dxynorm, dwrite
 import multiprocessing as mp
 
 
@@ -22,6 +22,7 @@ def main(
 
     # Process all files inside the '/input' folder
     inputfiles = readFiles()
+
     for file_path in inputfiles:
 
         print("\n")
@@ -174,20 +175,6 @@ def OLfunc(args, KDE_vals):
     """
     probs, _ = outer.loop(*args, KDE_vals)
     return probs
-
-
-def readFiles():
-    """
-    Read files from the input folder
-    """
-    files = []
-    for pp in Path('input').iterdir():
-        if pp.is_file():
-            files += [pp]
-        else:
-            files += [arch for arch in pp.iterdir()]
-
-    return files
 
 
 if __name__ == '__main__':

@@ -106,6 +106,21 @@ def readINI():
         C_thresh, cl_method_pars]
 
 
+def readFiles():
+    """
+    Read files from the input folder
+    """
+    files = []
+    for pp in Path('input').iterdir():
+        if not pp.name.endswith(".md"):
+            if pp.is_file():
+                files += [pp]
+            else:
+                files += [arch for arch in pp.iterdir()]
+
+    return files
+
+
 def dread(file_path, ID_c, x_c, y_c, data_cols, data_errs):
     """
     """
