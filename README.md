@@ -42,16 +42,22 @@ The accompanying article describing the code in detail can be accessed
 [via A&A][xxxx], and referenced using the following BibTeX entry:
 
 ````
-@article{Pera_2021,
-    author = {{Pera, M. S.}and {Perren, G. I.} and {Moitinho, A.} and {Navone, H. D.} and {V\'azquez, R. A.}},
-    title = {pyUPMASK: an improved unsupervised clustering algorithm},
-    DOI= "xxx",
-    url= "http://dx.doi.org/xxx",
-    journal = {A\&A},
-    year = 2021,
-    volume = ???,
-    pages = "??",
-    month = "??"
+@ARTICLE{2021A&A...650A.109P,
+       author = {{Pera}, M.~S. and {Perren}, G.~I. and {Moitinho}, A. and {Navone}, H.~D. and {Vazquez}, R.~A.},
+        title = "{pyUPMASK: an improved unsupervised clustering algorithm}",
+      journal = {\aap},
+     keywords = {open clusters and associations: general, methods: data analysis, open clusters and associations: individual: NGC 2516, methods: statistical, Astrophysics - Astrophysics of Galaxies},
+         year = 2021,
+        month = jun,
+       volume = {650},
+          eid = {A109},
+        pages = {A109},
+          doi = {10.1051/0004-6361/202040252},
+archivePrefix = {arXiv},
+       eprint = {2101.01660},
+ primaryClass = {astro-ph.GA},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2021A&A...650A.109P},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ````
 
