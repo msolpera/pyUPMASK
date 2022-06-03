@@ -61,6 +61,11 @@ def loop(
     # of field stars or actual cluster members, using their (x, y)
     # distribution.
     for i in range(labels.min(), labels.max() + 1):
+
+        # DBSCAN and HDBSCAN label outliers with a -1
+        if i == -1:
+            continue
+
         # Separate stars assigned to this label
         cl_msk = labels == i
 

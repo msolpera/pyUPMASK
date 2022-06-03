@@ -75,7 +75,7 @@ def readINI():
         'KMeans', 'MiniBatchKMeans', 'AffinityPropagation', 'MeanShift',
         'SpectralClustering', 'AgglomerativeClustering', 'DBSCAN', 'OPTICS',
         'Birch', 'GaussianMixture', 'BayesianGaussianMixture', 'Voronoi',
-        'rkmeans', 'kNNdens')
+        'rkmeans', 'kNNdens', 'HDBSCAN')
     if clust_method not in allowed_clust_methods:
         raise ValueError("Unrecognized clustering method '{}'".format(
             clust_method))

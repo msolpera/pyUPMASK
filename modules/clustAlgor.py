@@ -178,6 +178,10 @@ def sklearnMethods(clust_method, cl_method_pars, clust_data, n_clusters):
     elif clust_method == 'Birch':
         model = skclust.Birch()
 
+    elif clust_method == 'HDBSCAN':
+        import hdbscan
+        model = hdbscan.HDBSCAN()
+
     # Set parameters for the method (if any)
     if cl_method_pars:
         model.set_params(**cl_method_pars)
