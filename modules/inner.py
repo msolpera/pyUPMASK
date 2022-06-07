@@ -78,6 +78,10 @@ def loop(
         if cl_msk.sum() < minStars:
             continue
 
+        # Too many stars make the RKfunc consume too much memory
+        if cl_msk.sum() > 5000:
+            continue
+
         # Test how similar this cluster's (x, y) distribution is compared
         # to a uniform random distribution.
         if clRjctMethod == 'rkfunc':
