@@ -7,6 +7,33 @@ from scipy import spatial
 from .voronoiVols import voronoi_volumes
 
 
+def DDhisto(clust_data, N_membs, n_clusters):
+    """
+    Testing simple N-dimensional histogram
+    """
+    import pandas as pd
+    N_stars, N_dim = clust_data.shape
+
+    N_bins = N_stars / N_membs
+    if N_bins**N_dim > n_clusters:
+        N_bins = int(n_clusters**(1 / N_dim))
+
+    H, edges = np.histogramdd(clust_data, N_bins)
+
+    # Find indexes of points within edges
+    labels_dim = []
+    for dim in range(N_dim):
+        labels_dim.append(list(map(str, np.digitize(
+            clust_data.T[dim], edges[dim], right=True))))
+
+    # Convert the indexes of edges to a unique index
+    ids = ["".join(_) for _ in zip(*labels_dim)]
+    # Convert indexes to unique integers
+    labels = pd.factorize(ids)[0]
+
+    return labels
+
+
 def voronoi(clust_data, N_membs, n_clusters, N_st_max):
     """
     Voronoi assignation. Not really a clustering method.

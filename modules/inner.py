@@ -36,6 +36,7 @@ def loop(
     # Obtain all the clusters in the non-spatial data
     if clust_method == 'Voronoi':
         labels = clustAlgor.voronoi(clust_data, N_membs, n_clusters, N_st_max)
+        # labels = clustAlgor.DDhisto(clust_data, N_membs, n_clusters)
     elif clust_method == 'kNNdens':
         labels = clustAlgor.kNNdens(
             clust_data, cl_method_pars, N_membs, n_clusters, N_st_max)
