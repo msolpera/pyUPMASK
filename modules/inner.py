@@ -61,10 +61,12 @@ def loop(
     # For each cluster found by the clustering method, check if it is composed
     # of field stars or actual cluster members, using their (x, y)
     # distribution.
+    # C_s_all = []
     for i in range(labels.min(), labels.max() + 1):
 
         # DBSCAN and HDBSCAN label outliers with a -1
         if i == -1:
+            # C_s_all.append(0)
             continue
 
         # Separate stars assigned to this label
@@ -77,22 +79,25 @@ def loop(
 
         # Not enough elements, skip this cluster
         if cl_msk.sum() < minStars:
+            # C_s_all.append(0)
             continue
-
         # Too many stars make the RKfunc consume too much memory
         if cl_msk.sum() > 5000:
+            # C_s_all.append(0)
             continue
 
         # Test how similar this cluster's (x, y) distribution is compared
         # to a uniform random distribution.
-        if clRjctMethod == 'rkfunc':
-            C_s = rjctRandField.rkfunc(clust_xy[cl_msk], Kest)
-        if clRjctMethod == 'kdetest':
-            C_s, KDE_vals = rjctRandField.kdetest(
-                clust_xy[cl_msk], KDE_vals)
-        if clRjctMethod == 'kdetestpy':
-            C_s, KDE_vals = rjctRandField.kdetestpy(
-                clust_xy[cl_msk], KDE_vals)
+        # if clRjctMethod == 'rkfunc':
+        C_s = rjctRandField.rkfunc(clust_xy[cl_msk], Kest)
+        # if clRjctMethod == 'kdetest':
+        #     C_s, KDE_vals = rjctRandField.kdetest(
+        #         clust_xy[cl_msk], KDE_vals)
+        # if clRjctMethod == 'kdetestpy':
+        #     C_s, KDE_vals = rjctRandField.kdetestpy(
+        #         clust_xy[cl_msk], KDE_vals)
+
+        # C_s_all.append(C_s)
 
         # C_thresh : Any cluster with a smaller value will be classified as
         # being composed of field stars and discarded.
@@ -108,5 +113,16 @@ def loop(
             # Combine all the masks using a logical OR
             msk_all = np.logical_or.reduce([msk_all, cl_msk])
             N_survived += 1
+
+    # for i in np.argsort(C_s_all)[-10:]:
+    #     # Separate stars assigned to this label
+    #     cl_msk = labels == i
+
+    #     # Store mask that points to stars that should be *kept*
+    #     print("   Cluster {} survived (C_s={:.2f}), N={}".format(
+    #         i, C_s, cl_msk.sum()), file=prfl)
+    #     # Combine all the masks using a logical OR
+    #     msk_all = np.logical_or.reduce([msk_all, cl_msk])
+    #     N_survived += 1
 
     return N_clusts, msk_all, N_survived, KDE_vals
