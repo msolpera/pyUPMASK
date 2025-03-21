@@ -20,7 +20,7 @@ The `(pyupmask)` before the `$` symbol in the terminal indicates that the enviro
 
 Alternatively you can install the packages in your system directly using `pip`, but this method is not recommended.
 
-The latest version of the code can be obtained as a compressed file in [Releases](https://github.com/asteca/ASteCA/releases). Once downloaded, simply extract its contents anywhere in your system.
+Once you have downloaded the pyUPMASK compressed file from GitHub, simply extract its contents anywhere in your system.
 
 
 ## Running
@@ -39,7 +39,7 @@ The code comes with a synthetic cluster to test it. The results will be stored i
 ## Referencing
 
 The accompanying article describing the code in detail can be accessed
-[via A&A][xxxx], and referenced using the following BibTeX entry:
+[via A&A](https://www.aanda.org/articles/aa/pdf/2021/06/aa40252-20.pdf), and referenced using the following BibTeX entry:
 
 ````
 @ARTICLE{2021A&A...650A.109P,
